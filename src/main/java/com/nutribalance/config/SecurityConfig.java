@@ -52,11 +52,19 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**", "/chat/**", "/api/chat/**", "/ws/**", "/api/education/**").permitAll() 
-                .requestMatchers("/api/admin/**").hasRole("ADMIN") 
+                .requestMatchers(
+                    "/",
+                    "/health",
+                    "/api/auth/**",
+                    "/chat/**",
+                    "/api/chat/**",
+                    "/ws/**",
+                    "/api/education/**"
+                ).permitAll()
+                .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .requestMatchers("/api/doctor/**").hasRole("DOCTOR")
                 .requestMatchers("/api/parent/**", "/api/diet/**").hasAnyRole("PARENT", "CHILD", "DOCTOR")
-                .anyRequest().authenticated() 
+                .anyRequest().authenticated()
             );
 
         http.authenticationProvider(authenticationProvider());
@@ -68,11 +76,15 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("https://nutribalancefrontend-production.up.railway.app"));
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"));
+        config.setAllowedOrigins(List.of(
+            "https://nutribalancefrontend-production.up.railway.app",
+            "http://localhost:3000",
+            "http://localhost:5173"
+        ));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD", "PATCH"));
         config.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With", "Accept", "Origin"));
         config.setExposedHeaders(List.of("Authorization"));
-        config.setAllowCredentials(true); 
+        config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
